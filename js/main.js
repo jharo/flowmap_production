@@ -5,7 +5,7 @@ var map;
 //weborb 4 proxy obj
 var proxy;
 //appTimer is the timer for the entire application, it will drive the refresh interval and the clock updates.
-var appTimer; 
+var appTimer;
 //cameraTimer is the timer object for when the camera icon is clicked. it will refresh the camera image.
 var cameraTimer;
 //these are the default images for the cctv icons
@@ -30,50 +30,50 @@ var readerLocations;
 var markerCluster;
 var myCameraMarkers = new Array();
 var cctvClusterStyle = [{
-	url : "img/cctv/cluster/cctv_blue.png",
-	height : 40,
-	width : 40,
-	anchor : [20, 0],
-	textColor : "#000000",
-	textSize : 14,
-	fontFamily : "ubuntu",
-	fontWeight : "normal"
+	url: "img/cctv/cluster/cctv_blue.png",
+	height: 40,
+	width: 40,
+	anchor: [20, 0],
+	textColor: "#000000",
+	textSize: 14,
+	fontFamily: "ubuntu",
+	fontWeight: "normal"
 }, {
-	url : "img/cctv/cluster/cctv_yellow.png",
-	height : 50,
-	width : 50,
-	anchor : [25, 0],
-	textColor : "#000000",
-	textSize : 14,
-	fontFamily : "ubuntu",
-	fontWeight : "normal",
+	url: "img/cctv/cluster/cctv_yellow.png",
+	height: 50,
+	width: 50,
+	anchor: [25, 0],
+	textColor: "#000000",
+	textSize: 14,
+	fontFamily: "ubuntu",
+	fontWeight: "normal",
 }, {
-	url : "img/cctv/cluster/cctv_red.png",
-	height : 60,
-	width : 60,
-	anchor : [30, 0],
-	textColor : "#444444",
-	textSize : 14,
-	fontFamily : "ubuntus",
-	fontWeight : "normal"
+	url: "img/cctv/cluster/cctv_red.png",
+	height: 60,
+	width: 60,
+	anchor: [30, 0],
+	textColor: "#444444",
+	textSize: 14,
+	fontFamily: "ubuntus",
+	fontWeight: "normal"
 }, {
-	url : "img/cctv/cluster/cctv_pink.png",
-	height : 70,
-	width : 70,
-	anchor : [35, 0],
-	textColor : "#444444",
-	textSize : 14,
-	fontFamily : "ubuntu",
-	fontWeight : "normal"
+	url: "img/cctv/cluster/cctv_pink.png",
+	height: 70,
+	width: 70,
+	anchor: [35, 0],
+	textColor: "#444444",
+	textSize: 14,
+	fontFamily: "ubuntu",
+	fontWeight: "normal"
 }, {
-	url : "img/cctv/cluster/cctv_purple.png",
-	height : 80,
-	width : 80,
-	anchor : [40, 0],
-	textColor : "#444444",
-	textSize : 22,
-	fontFamily : "ubuntu",
-	fontWeight : "normal"
+	url: "img/cctv/cluster/cctv_purple.png",
+	height: 80,
+	width: 80,
+	anchor: [40, 0],
+	textColor: "#444444",
+	textSize: 22,
+	fontFamily: "ubuntu",
+	fontWeight: "normal"
 }];
 
 //we define an infowindow object to hold the camera image.
@@ -84,6 +84,7 @@ var transcomReaderLocations;
 //mimLinks is an array that will hold the traveltime links overlay objects once created on the map. we will also used these to hide them from the menu
 var mimLinks;
 var transcomLinks;
+var wifiLinks;
 //linkToolTip is an InfoBox class object that will appear when the user mouseover the link. it is defined by the Infobox class library
 var linkToolTip;
 //object to use for the polyline directional arrow
@@ -93,12 +94,12 @@ var myTime;
 var myDate;
 //properties for the polylines
 var defaultPolylineColorOptions = {
-	strokeWeight : 3,
-	strokeOpacity : 1
+	strokeWeight: 3,
+	strokeOpacity: 1
 };
 var onPolylineHoverColorOptions = {
-	strokeWeight : 5,
-	strokeOpacity : .80
+	strokeWeight: 5,
+	strokeOpacity: .80
 };
 //dataRefreshInterval_seconds is the amount of time that will pass before the timer resets and grabs new data for the links
 //it used primaraly by the timer function and reset by it.
@@ -122,53 +123,54 @@ function initialize() {
 	transcomReaderLocations = new Array();
 	mimLinks = new Array();
 	transcomLinks = new Array();
+	wifiLinks = new Array();
 	appTimer = new Timer();
 	appTimer.Interval = 1000;
 	cameraTimer = new Timer();
 	cameraTimer.Interval = 2000;
 
 	linkToolTip = new InfoBox({
-		closeBoxURL : "",
-		boxClass : "tooltip",
-		disableAutoPan : true,
-		maxWidth : 0,
-		pixelOffset : new google.maps.Size(10, 10)
+		closeBoxURL: "",
+		boxClass: "tooltip",
+		disableAutoPan: true,
+		maxWidth: 0,
+		pixelOffset: new google.maps.Size(10, 10)
 
 	});
 
 	//create an arrow symbol for the polylines
 	arrowSymbol = {
-		path : google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-		scale : 2,
-		strokeColor : '#444444',
-		strokeWeight : 1,
-		fillOpacity : 1,
-		fillColor : '#444444'
+		path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+		scale: 2,
+		strokeColor: '#444444',
+		strokeWeight: 1,
+		fillOpacity: 1,
+		fillColor: '#444444'
 
 	};
 
 	//create a custom map style
 	var customMapStyle = createMyMapStyle();
 	var styledMap = new google.maps.StyledMapType(customMapStyle, {
-		name : "tmc"
+		name: "tmc"
 	});
 
 	//create a set of options for the map to run
 	var mapOptions = {
-		center : new google.maps.LatLng(40.71462, -74.006600),
-		zoom : 11,
-		streetViewControl : true,
-		streetViewControlOptions : {
-			position : google.maps.ControlPosition.RIGHT_TOP
+		center: new google.maps.LatLng(40.71462, -74.006600),
+		zoom: 11,
+		streetViewControl: true,
+		streetViewControlOptions: {
+			position: google.maps.ControlPosition.RIGHT_TOP
 		},
-		zoomControl : false,
-		panControl : false,
-		scaleControl : true,
-		mapTypeControl : false,
-		mapTypeControlOptions : {
-			mapTypeIds : [google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.SATELLITE, google.maps.MapTypeId.HYBRID, "map_style"],
-			style : google.maps.MapTypeControlStyle.DROPDOWN_MENU,
-			position : google.maps.ControlPosition.TOP_LEFT
+		zoomControl: false,
+		panControl: false,
+		scaleControl: true,
+		mapTypeControl: false,
+		mapTypeControlOptions: {
+			mapTypeIds: [google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.SATELLITE, google.maps.MapTypeId.HYBRID, "map_style"],
+			style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+			position: google.maps.ControlPosition.TOP_LEFT
 		}
 	};
 
@@ -187,20 +189,20 @@ function initialize() {
 
 	//here we add a set of custom map controls. The controls are stored in the 'myCustomControls.js' file
 	var mOptions = {
-		gmap : map,
-		position : google.maps.ControlPosition.TOP_RIGHT,
+		gmap: map,
+		position: google.maps.ControlPosition.TOP_RIGHT,
 
 	};
 
 	var dOptions = {
-		gmap : map,
-		position : google.maps.ControlPosition.RIGHT_BOTTOM,
-		message : 'The link colors are derived from the aggregation of the last 15 minutes of data<br>The last data update occurred on: '
+		gmap: map,
+		position: google.maps.ControlPosition.RIGHT_BOTTOM,
+		message: 'The link colors are derived from the aggregation of the last 15 minutes of data<br>The last data update occurred on: '
 	};
 	var legendOptions = {
-		gmap : map,
-		legendTitle : 'Legend',
-		position : google.maps.ControlPosition.RIGHT_BOTTOM
+		gmap: map,
+		legendTitle: 'Legend',
+		position: google.maps.ControlPosition.RIGHT_BOTTOM
 
 	};
 
@@ -222,10 +224,13 @@ function initialize() {
 function ontilesloaded() {
 	//console.log('tiles loaded...so begin the loading of the weborb objects');
 	//invoke weborb server
-	invokeServer(true);
+	//invokeServer(true);
 	//getMimLocations();
 	getTranscomLocations();
 	getTranscomPolylines();
+
+	getWifiLocations();
+	getWifiPolylines();
 	//getMimPolylines();
 }
 
@@ -251,68 +256,126 @@ function invokeServer(syncMode) {
 
 }
 
-function getMimLocations() {
+function getWifiLocations() {
 	$.ajax({
-		type : "GET",
-		url : "data/mim_locations_info.json",
-		async : true,
-		dataType : "json",
-		contentType : "application/json", // content type sent to server
-		success : getMimLocations_sucess,
-		error : ServiceFailed
+		type: "GET",
+		url: "http://flowmap.nyctmc.org/flowmap_json_data_sources/wifi_locations_info.json",
+		async: true,
+		dataType: "json",
+		contentType: "application/json", // content type sent to server
+		success: getWifiLocations_success,
+		error: ServiceFailed
 	});
 }
+
+function getMimLocations() {
+	$.ajax({
+		type: "GET",
+		url: "data/mim_locations_info.json",
+		async: true,
+		dataType: "json",
+		contentType: "application/json", // content type sent to server
+		success: getMimLocations_sucess,
+		error: ServiceFailed
+	});
+}
+
 function getTranscomLocations() {
 	$.ajax({
-		type : "GET",
-		url : "http://flowmap.nyctmc.org/flowmap_json_data_sources/transcom_locations_info.json",
-		async : true,
-		dataType : "json",
-		contentType : "application/json", // content type sent to server
-		success : getTranscomLocations_success,
-		error : ServiceFailed
+		type: "GET",
+		url: "http://flowmap.nyctmc.org/flowmap_json_data_sources/transcom_locations_info.json",
+		async: true,
+		dataType: "json",
+		contentType: "application/json", // content type sent to server
+		success: getTranscomLocations_success,
+		error: ServiceFailed
 	});
 }
 
 function getTranscomPolylines() {
 	$.ajax({
-		type : "GET",
-		url : "http://flowmap.nyctmc.org/flowmap_json_data_sources/transcom_polylines_info.json",
-		async : true,
-		dataType : "json",
+		type: "GET",
+		url: "http://flowmap.nyctmc.org/flowmap_json_data_sources/transcom_polylines_info.json",
+		async: true,
+		dataType: "json",
 		//data: '{"value": "' + 65+ '"}',
-		contentType : "application/json", // content type sent to server
-		success : getTranscomPolylines_success,
-		error : ServiceFailed
+		contentType: "application/json", // content type sent to server
+		success: getTranscomPolylines_success,
+		error: ServiceFailed
+	});
+}
+
+function getWifiPolylines() {
+	$.ajax({
+		type: "GET",
+		url: "http://flowmap.nyctmc.org/flowmap_json_data_sources/wifi_polylines_info.json",
+		async: true,
+		dataType: "json",
+		//data: '{"value": "' + 65+ '"}',
+		contentType: "application/json", // content type sent to server
+		success: getWifiPolylines_success,
+		error: ServiceFailed
 	});
 }
 
 function getMimPolylines() {
 	$.ajax({
-		type : "GET",
-		url : "data/mim_polylines_info.json",
-		async : true,
-		dataType : "json",
+		type: "GET",
+		url: "data/mim_polylines_info.json",
+		async: true,
+		dataType: "json",
 		//data: '{"value": "' + 65+ '"}',
-		contentType : "application/json", // content type sent to server
-		success : getMimPolylines_success,
-		error : ServiceFailed
+		contentType: "application/json", // content type sent to server
+		success: getMimPolylines_success,
+		error: ServiceFailed
 	});
 }
 
 function getTranscomLinkData() {
 	$.ajax({
-		type : "GET",
-		url : "http://flowmap.nyctmc.org/flowmap_json_data_sources/transcom_link_data.json",
-		async : true,
-		dataType : "json",
-		contentType : "application/json", // content type sent to server
-		success : processTranscomLinkData_success,
-		error : processTranscomLinkData_error
+		type: "GET",
+		url: "http://flowmap.nyctmc.org/flowmap_json_data_sources/transcom_link_data.json",
+		async: true,
+		dataType: "json",
+		contentType: "application/json", // content type sent to server
+		success: processTranscomLinkData_success,
+		error: processTranscomLinkData_error
 	});
-
 }
 
+
+function getWifiLinkData() {
+	$.ajax({
+		type: "GET",
+		url: "http://flowmap.nyctmc.org/flowmap_json_data_sources/wifi_median_traveltime_data.json",
+		async: true,
+		dataType: "json",
+		contentType: "application/json", // content type sent to server
+		success: processWifiLinkData_success,
+		error: processWifiLinkData_error
+	});
+}
+
+
+function getWifiLocations_success(results) {
+	console.log("success got wifi locations: " + results.RECORDS.length);
+	if (results.RECORDS.length != 0 || results.RECORDS.length != null) {
+		for (var i = 0; i < results.RECORDS.length; i++) {
+			//console.log(results.RECORDS[i].lat+" "+results.RECORDS[i].lng);
+			var readerMarker = new google.maps.Marker({
+				position: new google.maps.LatLng(results.RECORDS[i].lat, results.RECORDS[i].lng),
+				map: map,
+				icon: {
+					url: readerLocationIcon_good,
+					size: new google.maps.Size(16, 16),
+					origin: new google.maps.Point(0, 0),
+					anchor: new google.maps.Point(8, 8)
+				},
+				title: results.RECORDS[i].location_name + " (location ID: " + results.RECORDS[i].lid + ")\nHEX: " + results.RECORDS[i].moxa_hex
+			});
+		}
+	}
+}
 
 function getMimLocations_sucess(results) {
 	console.log("success got mim locations: " + results.RECORDS.length);
@@ -320,15 +383,15 @@ function getMimLocations_sucess(results) {
 		for (var i = 0; i < results.RECORDS.length; i++) {
 			//console.log(results.RECORDS[i].lat+" "+results.RECORDS[i].lng);
 			var readerMarker = new google.maps.Marker({
-				position : new google.maps.LatLng(results.RECORDS[i].lat, results.RECORDS[i].lng),
-				map : map,
-				icon : {
-					url : readerLocationIcon_good,
-					size : new google.maps.Size(16, 16),
-					origin : new google.maps.Point(0, 0),
-					anchor : new google.maps.Point(8, 8)
+				position: new google.maps.LatLng(results.RECORDS[i].lat, results.RECORDS[i].lng),
+				map: map,
+				icon: {
+					url: readerLocationIcon_good,
+					size: new google.maps.Size(16, 16),
+					origin: new google.maps.Point(0, 0),
+					anchor: new google.maps.Point(8, 8)
 				},
-				title : results.RECORDS[i].location_name + " (location ID: " + results.RECORDS[i].lid + ")\ntotal number of readers at location: "+results.RECORDS[i].total_readers
+				title: results.RECORDS[i].location_name + " (location ID: " + results.RECORDS[i].lid + ")\ntotal number of readers at location: " + results.RECORDS[i].total_readers
 			});
 
 		}
@@ -343,20 +406,22 @@ function getTranscomLocations_success(results) {
 		for (var i = 0; i < results.RECORDS.length; i++) {
 			//console.log(results.RECORDS[i].lat+" "+results.RECORDS[i].lng);
 			var locationStatusIcon;
-			if (results.RECORDS[i].userstatuscode == "4"){
+			if (results.RECORDS[i].userstatuscode == "4") {
 				locationStatusIcon = readerLocationIcon_fail;
-				
-			}else{locationStatusIcon=readerLocationIcon_good;}
+
+			} else {
+				locationStatusIcon = readerLocationIcon_good;
+			}
 			var readerMarker = new google.maps.Marker({
-				position : new google.maps.LatLng(results.RECORDS[i].latitude, results.RECORDS[i].longitude),
-				map : map,
-				icon : {
-					url : locationStatusIcon,
-					size : new google.maps.Size(16, 16),
-					origin : new google.maps.Point(0, 0),
-					anchor : new google.maps.Point(8, 8)
+				position: new google.maps.LatLng(results.RECORDS[i].latitude, results.RECORDS[i].longitude),
+				map: map,
+				icon: {
+					url: locationStatusIcon,
+					size: new google.maps.Size(16, 16),
+					origin: new google.maps.Point(0, 0),
+					anchor: new google.maps.Point(8, 8)
 				},
-				title : results.RECORDS[i].readername + "\norg: " + results.RECORDS[i].serverset + ")\nstatus code: "+results.RECORDS[i].userstatuscode
+				title: results.RECORDS[i].readername + "\norg: " + results.RECORDS[i].serverset + ")\nstatus code: " + results.RECORDS[i].userstatuscode
 			});
 			readerLocations.push(readerMarker);
 
@@ -373,10 +438,10 @@ function getMimPolylines_success(results) {
 	if (results.RECORDS != null && results.RECORDS.length != 0) {
 		for (var i = 0; i < results.RECORDS.length; i++) {
 			var mypoly = new google.maps.Polyline({
-				path : google.maps.geometry.encoding.decodePath(results.RECORDS[i].polyline),
-				geodesic : true,
-				strokeOpacity : 1,
-				strokeWeight : 2,
+				path: google.maps.geometry.encoding.decodePath(results.RECORDS[i].polyline),
+				geodesic: true,
+				strokeOpacity: 1,
+				strokeWeight: 2,
 			});
 
 			mypoly.linkName = results.RECORDS[i].linkName;
@@ -407,16 +472,158 @@ function getMimPolylines_success(results) {
 	}
 }
 
+
+
+function getWifiPolylines_success(results) {
+	//console.log("sucess getting transcom polylines: "+results.RECORDS.length);
+	if (results.RECORDS != null && results.RECORDS.length != 0) {
+		for (var i = 0; i < results.RECORDS.length; i++) {
+			//console.log(results.RECORDS[i].xcomID);
+			//
+			//
+			// Define a symbol using SVG path notation, with an opacity of 1.
+
+
+			var mypoly = new google.maps.Polyline({
+				path: google.maps.geometry.encoding.decodePath(results.RECORDS[i].polyline),
+				geodesic: true,
+				strokeOpacity: 1,
+				strokeWeight : 2
+			});
+			mypoly.id = results.RECORDS[i].sid;
+			mypoly.linkName = results.RECORDS[i].location_name;
+			mypoly.streetType = results.RECORDS[i].type;
+			//mypoly.speedMph = 0;
+			mypoly.medianTt_sec = 0;
+			mypoly.medianTt = "undefined"
+			mypoly.numberOfRecords = 0;
+			mypoly.recordTimeStamp = "";
+			mypoly.linkColor = "undefined";
+			mypoly.linkLength = google.maps.geometry.spherical.computeLength(mypoly.getPath()).toFixed(2);
+
+			wifiLinks.push(mypoly);
+			mypoly.setMap(map);
+
+			//google.maps.event.addListener(mypoly, 'click', onPolylineMouseClick);
+			google.maps.event.addListener(mypoly, 'mouseover', onWifiPolylineMouseOver);
+			google.maps.event.addListener(mypoly, 'mouseout', onWifiPolylineMouseOut);
+		}
+		//after the polylines are drawn get the data for the first time
+		getWifiLinkData();
+
+	} else {
+		alert("no polylines found on server");
+	}
+
+}
+
+function processWifiLinkData_success(results) {
+	console.log("success getting wifi link data: " + results.RECORDS.length + " records obtained");
+	for (var i = 0; i < results.RECORDS.length; i++) {
+		var id = results.RECORDS[i].sid;
+		for (var j = 0; j < wifiLinks.length; j++) {
+			if (id == wifiLinks[j].id) {
+				//console.log(id+" = "+transcomLinks[j].id);
+				//transcomLinks[j].speedMph = results.RECORDS[i].speed_mph;
+				wifiLinks[j].medianTt_sec = results.RECORDS[i].median_tt_sec;
+				wifiLinks[j].medianTt = results.RECORDS[i].median_tt;
+				wifiLinks[j].numberOfRecords = results.RECORDS[i].n_records;
+				wifiLinks[j].recordTimeStamp = results.RECORDS[i].time_stamp;
+
+
+				wifiLinks[j].linkColor = getWifiLinkColor(1, wifiLinks[j].medianTt_sec, wifiLinks[j].numberOfRecords);
+
+
+				wifiLinks[j].setOptions({
+					strokeColor: wifiLinks[j].linkColor,
+					icons: [{
+						icon: {
+							path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+							scale: 2,
+							strokeColor: '#444',
+							strokeWeight: .5,
+							fillOpacity: 1,
+						},
+						offset: '50%'
+					}]
+				});
+			}
+		}
+	}
+}
+
+function getWifiLinkColor(speed, travelTime, nRecords) {
+	var c = 'undefined';
+	if (speed > 0) {
+		if (nRecords < 2) {
+			c = '#4E7AC7';
+			//blue
+		} else if (0 < travelTime && travelTime <= 180) {
+			c = '#32CD32';
+			//green
+		} else if (180 < travelTime && travelTime <= 270) {
+			c = '#FFDF00';
+			//yellow
+		} else if (270 < travelTime && travelTime <= 360) {
+			c = '#ffa500';
+			//orange
+		} else if (360 < travelTime) {
+			c = '#ff0000';
+			//red
+		}
+
+	} else {
+		c = '#444444';
+	}
+	return c;
+}
+
+function processWifiLinkData_error(e) {
+	alert("could not get the wifi link data");
+}
+
+
+function onWifiPolylineMouseOver(e) {
+	var tooltipContent = "";
+	this.setOptions(onPolylineHoverColorOptions);
+	if (this.icons != null) {
+		this.icons[0].icon.scale = 3;
+	}
+	tooltipContent = "<span><b>" + this.linkName + "</b></span><hr>";
+	tooltipContent += "<br>segment ID: " + this.id;
+	tooltipContent += "<br>number of records: " + this.numberOfRecords;
+	tooltipContent += "<br>approx. median travel-time: " + this.medianTt_sec + " seconds ( "+this.medianTt+" )";
+	//tooltipContent += "<br>approx. speed: " + this.speedMph+ "(MPH)";
+	tooltipContent += "<br>record timestamp: " + this.recordTimeStamp;
+	tooltipContent += "<br>segment length: " + this.linkLength + " meters (" + (this.linkLength * 3.2808).toFixed(2) + " ft)";
+
+	linkToolTip.setContent(tooltipContent);
+	//here e is the overlay object and whenever we hover over the overlay we can get the coords to use with our infobox tooltip
+	linkToolTip.setPosition(e.latLng);
+	linkToolTip.open(map);
+}
+
+function onWifiPolylineMouseOut(e) {
+	this.setOptions(defaultPolylineColorOptions);
+	if (this.icons != null) {
+		this.icons[0].icon.scale = 2;
+	}
+	linkToolTip.close();
+}
+
+
+
+
 function getTranscomPolylines_success(results) {
 	//console.log("sucess getting transcom polylines: "+results.RECORDS.length);
 	if (results.RECORDS != null && results.RECORDS.length != 0) {
 		for (var i = 0; i < results.RECORDS.length; i++) {
 			//console.log(results.RECORDS[i].xcomID);
 			var mypoly = new google.maps.Polyline({
-				path : google.maps.geometry.encoding.decodePath(results.RECORDS[i].polyline),
-				geodesic : true,
-				strokeOpacity : 1,
-				strokeWeight : 2,
+				path: google.maps.geometry.encoding.decodePath(results.RECORDS[i].polyline),
+				geodesic: true,
+				strokeOpacity: 1,
+				strokeWeight: 2,
 			});
 			mypoly.id = results.RECORDS[i].ExternalId;
 			mypoly.linkName = results.RECORDS[i].Name;
@@ -464,39 +671,33 @@ function processTranscomLinkData_success(results) {
 				transcomLinks[j].ConfidenceLevel = results.RECORDS[i].ConfidenceLevel;
 				transcomLinks[j].FromSyntheticSegment = results.RECORDS[i].FromSyntheticSegment;
 				transcomLinks[j].recordTimeStamp = results.RECORDS[i].TimeStamp;
-				
-				//if (transcomLinks[j].readersStatus != "both failed") {
-					transcomLinks[j].linkColor = transcomGetLinkColor(transcomLinks[j].VehiclesInSample, transcomLinks[j].speedMph, transcomLinks[j].SystemStatus, transcomLinks[j].FromSyntheticSegment,transcomLinks[j].ConfidenceLevel);
-				//}//console.log(transcomLinks[j].icons[0].icon.fillColor);
-transcomLinks[j].setOptions({
-					strokeColor : transcomLinks[j].linkColor,
 
-					icons : [{
-						icon : {
-							path : google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-							scale : 2,
-							strokeColor:'#444',
-							strokeWeight : .5,
-							fillOpacity : 1,
+				//if (transcomLinks[j].readersStatus != "both failed") {
+				transcomLinks[j].linkColor = transcomGetLinkColor(transcomLinks[j].VehiclesInSample, transcomLinks[j].speedMph, transcomLinks[j].SystemStatus, transcomLinks[j].FromSyntheticSegment, transcomLinks[j].ConfidenceLevel);
+				//}//console.log(transcomLinks[j].icons[0].icon.fillColor);
+				transcomLinks[j].setOptions({
+					strokeColor: transcomLinks[j].linkColor,
+					icons: [{
+						icon: {
+							path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+							scale: 2,
+							strokeColor: '#444',
+							strokeWeight: .5,
+							fillOpacity: 1,
 							//fillColor :transcomLinks[j].linkColor
 						},
-						offset : '50%'
+						offset: '50%'
 					}]
-				}); 
-
-				
-
+				});
 			}
-
 		}
 	}
 }
 
 
-function transcomGetLinkColor(nRecords,speed,status,linkType,confidence)
-{
+function transcomGetLinkColor(nRecords, speed, status, linkType, confidence) {
 	var c = 'undefined';
-	if ((speed > 0) && (status=="Operational" || status=="Unknown" || status=="Warning")) {
+	if ((speed > 0) && (status == "Operational" || status == "Unknown" || status == "Warning")) {
 		if (nRecords < 5) {
 			c = '#4E7AC7';
 			//blue
@@ -520,6 +721,7 @@ function transcomGetLinkColor(nRecords,speed,status,linkType,confidence)
 	}
 	return c;
 }
+
 function processTranscomLinkData_error(e) {
 	alert("could not get the transcom link data");
 }
@@ -532,13 +734,9 @@ function processTranscomLinkData_error(e) {
 function onTranscomPolylineMouseOver(e) {
 	var tooltipContent = "";
 	this.setOptions(onPolylineHoverColorOptions);
-	if (this.icons != null){
+	if (this.icons != null) {
 		this.icons[0].icon.scale = 3;
 	}
-		
-
-
-
 	tooltipContent = "<span><b>" + this.linkName + "</b></span><hr>";
 	tooltipContent += "<br>segment ID: " + this.id;
 	tooltipContent += "<br>number of records: " + this.VehiclesInSample;
@@ -546,7 +744,7 @@ function onTranscomPolylineMouseOver(e) {
 	tooltipContent += "<br>link readers status: " + this.readersStatus;
 	tooltipContent += "<br>link status: " + this.SystemStatus;
 	tooltipContent += "<br>approx. travel-time: " + this.currTtSec + " seconds";
-	tooltipContent += "<br>approx. speed: " + this.speedMph+ "(MPH)";
+	tooltipContent += "<br>approx. speed: " + this.speedMph + "(MPH)";
 	tooltipContent += "<br>record timestamp: " + this.recordTimeStamp;
 	tooltipContent += "<br>segment length: " + this.linkLength + " meters (" + (this.linkLength * 3.2808).toFixed(2) + " ft)";
 	tooltipContent += "<br>confidence level: " + this.ConfidenceLevel;
@@ -559,12 +757,15 @@ function onTranscomPolylineMouseOver(e) {
 	linkToolTip.open(map);
 }
 
+
+
+
 function onMimPolylineMouseOver(e) {
 	var tooltipContent = "";
 	this.setOptions(onPolylineHoverColorOptions);
 	tooltipContent = "<span><b>" + this.linkName + "</b></span><hr>number of records: " + this.numberOfRecords;
-	tooltipContent += "<br>borough: "+this.borough;
-	tooltipContent += "<br>road designation: "+this.road_designation;
+	tooltipContent += "<br>borough: " + this.borough;
+	tooltipContent += "<br>road designation: " + this.road_designation;
 	tooltipContent += "<br>approx. median travel-time: " + this.medianTtString;
 	tooltipContent += "<br>approx. median speed (mph): " + this.medianSpeedMph;
 	tooltipContent += "<br>median record timestamp: " + moment(this.medianTtDatetime).format("M-DD-YY h:mm:ss a");
@@ -580,16 +781,14 @@ function onMimPolylineMouseOver(e) {
 
 
 /**
- * 
+ *
  * onPolyMouseOver is the listener method for the google maps mouseover event. it will create a tooltip and change the polyline
  * settings
  */
-function onPolylineMouseOver(e)
-{
+function onPolylineMouseOver(e) {
 	var tooltipContent = "";
 	this.setOptions(onPolylineHoverColorOptions);
-	if (this.linkColor != "undefined")
-	{
+	if (this.linkColor != "undefined") {
 		this.icons[0].icon.fillColor = this.linkColor;
 	}
 
@@ -597,7 +796,7 @@ function onPolylineMouseOver(e)
 	tooltipContent += "<br>approx. median travel-time: " + this.medianTtString;
 	tooltipContent += "<br>approx. median speed (mph): " + this.medianSpeedMph;
 	tooltipContent += "<br>median record timestamp: " + moment(this.medianTtDatetime).format("M-DD-YY h:mm:ss a");
-	tooltipContent += "<br>segment length: " + this.linkLength + " meters (" +(this.linkLength*3.2808).toFixed(2)+" ft)";
+	tooltipContent += "<br>segment length: " + this.linkLength + " meters (" + (this.linkLength * 3.2808).toFixed(2) + " ft)";
 	tooltipContent += "<br>segment ID " + this.sid;
 	tooltipContent += "<br>segment points: " + this.lid0 + " to " + this.lid1;
 
@@ -614,10 +813,9 @@ function onPolylineMouseOver(e)
 
 function onPolylineMouseOut(e) {
 	this.setOptions(defaultPolylineColorOptions);
-	if(this.icons != null){
+	if (this.icons != null) {
 		this.icons[0].icon.scale = 2;
 	}
-	
 	linkToolTip.close();
 }
 
@@ -642,12 +840,15 @@ function mytick() {
 	document.getElementById("timeLeft").innerHTML = "Seconds left until next refresh: " + (secondsToNextRefresh--);
 	//console.log(myDate+" "+myTime+" timer current count: "+appTimer.currentCount);
 	if (appTimer.currentCount == dataRefreshInterval_seconds) {
+
+
 		//refresh the MIM data
 		//console.log('refreshing data');
-		proxy.getSegmentsMedianTravelTimes("00:15:00", new Async(travelTimeDataSuccess, travelTimeDataError));
-		
+		//proxy.getSegmentsMedianTravelTimes("00:15:00", new Async(travelTimeDataSuccess, travelTimeDataError));
+
 		getTranscomLinkData();
-		
+		getWifiLinkData();
+
 		//reset the timer so the current count resets as well
 		appTimer.Reset();
 		document.getElementById("disclaimerDateTime").innerHTML = moment().format('MMMM Do YYYY, h:mm:ss a');
@@ -663,92 +864,89 @@ function createMyMapStyle() {
 	var style = new Array();
 
 	var style = [{
-		"featureType" : "administrative",
-		"elementType" : "all",
-		"stylers" : [{
-			"visibility" : "on"
+		"featureType": "administrative",
+		"elementType": "all",
+		"stylers": [{
+			"visibility": "on"
 		}, {
-			"saturation" : -100
+			"saturation": -100
 		}, {
-			"lightness" : 20
+			"lightness": 20
 		}]
 	}, {
-		"featureType" : "administrative.neighborhood",
-		"elementType" : "labels.text",
-		"stylers" : [{
-			"visibility" : "off"
+		"featureType": "administrative.neighborhood",
+		"elementType": "labels.text",
+		"stylers": [{
+			"visibility": "off"
 		}]
 	}, {
-		"featureType" : "landscape.man_made",
-		"elementType" : "all",
-		"stylers" : [{
-			"visibility" : "off"
+		"featureType": "landscape.man_made",
+		"elementType": "all",
+		"stylers": [{
+			"visibility": "off"
 		}, {
-			"saturation" : -60
+			"saturation": -60
 		}, {
-			"lightness" : 10
+			"lightness": 10
 		}]
 	}, {
-		"featureType" : "landscape.natural",
-		"elementType" : "all",
-		"stylers" : [{
-			"visibility" : "simplified"
+		"featureType": "landscape.natural",
+		"elementType": "all",
+		"stylers": [{
+			"visibility": "simplified"
 		}, {
-			"saturation" : -60
+			"saturation": -60
 		}, {
-			"lightness" : 60
+			"lightness": 60
 		}]
 	}, {
-		"featureType" : "poi",
-		"elementType" : "all",
-		"stylers" : [{
-			"visibility" : "off"
+		"featureType": "poi",
+		"elementType": "all",
+		"stylers": [{
+			"visibility": "off"
 		}, {
-			"saturation" : -100
+			"saturation": -100
 		}, {
-			"lightness" : 60
+			"lightness": 60
 		}]
 	}, {
-		"featureType" : "road",
-		"elementType" : "all",
-		"stylers" : [{
-			"visibility" : "on"
+		"featureType": "road",
+		"elementType": "all",
+		"stylers": [{
+			"visibility": "on"
 		}, {
-			"saturation" : -100
+			"saturation": -100
 		}, {
-			"lightness" : 40
+			"lightness": 40
 		}]
 	}, {
-		"featureType" : "transit",
-		"elementType" : "all",
-		"stylers" : [{
-			"visibility" : "off"
+		"featureType": "transit",
+		"elementType": "all",
+		"stylers": [{
+			"visibility": "off"
 		}, {
-			"saturation" : -100
+			"saturation": -100
 		}, {
-			"lightness" : 60
+			"lightness": 60
 		}]
 	}, {
-		"featureType" : "water",
-		"elementType" : "all",
-		"stylers" : [{
-			"visibility" : "on"
+		"featureType": "water",
+		"elementType": "all",
+		"stylers": [{
+			"visibility": "on"
 		}, {
-			"saturation" : -10
+			"saturation": -10
 		}, {
-			"lightness" : 30
+			"lightness": 30
 		}]
 	}];
 
 	return style;
 }
 
-function successReaderLocation(results)
-{
-	if (results.length != 0 || results != null)
-	{
-		for (var i = 0; i < results.length; i++)
-		{
+function successReaderLocation(results) {
+	if (results.length != 0 || results != null) {
+		for (var i = 0; i < results.length; i++) {
 			var readerLocation = createReaderMarker(results[i]);
 			readerLocations.push(readerLocation);
 		}
@@ -758,22 +956,19 @@ function successReaderLocation(results)
 }
 
 
-function createReaderMarker(readerLocationObj)
-{
+function createReaderMarker(readerLocationObj) {
 	var locationCoords = new google.maps.LatLng(readerLocationObj.lat, readerLocationObj.lng);
-	var markerIcon =
-	{
-		url : readerLocationIcon,
-		size : new google.maps.Size(16, 16),
-		origin : new google.maps.Point(0, 0),
-		anchor : new google.maps.Point(8, 8)
+	var markerIcon = {
+		url: readerLocationIcon,
+		size: new google.maps.Size(16, 16),
+		origin: new google.maps.Point(0, 0),
+		anchor: new google.maps.Point(8, 8)
 	};
-	var readerMarker = new google.maps.Marker(
-	{
-		position : locationCoords,
-		map : map,
-		icon : markerIcon,
-		title : readerLocationObj.name + " (location ID: " + readerLocationObj.lid + ")"
+	var readerMarker = new google.maps.Marker({
+		position: locationCoords,
+		map: map,
+		icon: markerIcon,
+		title: readerLocationObj.name + " (location ID: " + readerLocationObj.lid + ")"
 	});
 
 	return readerMarker;
@@ -782,14 +977,11 @@ function createReaderMarker(readerLocationObj)
 //---------------------------------------------------------------------------------------polyline link functions-------------------------------------------------------//
 /**
  *
- * successMimPolylines 
+ * successMimPolylines
  */
-function successMimPolylines(results)
-{
-	if (results != null && results.length != 0)
-	{
-		for (var i = 0; i < results.length; i++)
-		{
+function successMimPolylines(results) {
+	if (results != null && results.length != 0) {
+		for (var i = 0; i < results.length; i++) {
 			var polyline = createExistingPolyline(results[i]);
 			polyline.setMap(map);
 			mimLinks.push(polyline);
@@ -800,38 +992,32 @@ function successMimPolylines(results)
 
 		//after the polylines are drawn get the data for the first time
 		proxy.getSegmentsMedianTravelTimes("00:15:00", new Async(travelTimeDataSuccess, travelTimeDataError));
-	}
-	else
-	{
+	} else {
 		alert("no polylines found on server");
 	}
 }
 
-function createExistingPolyline(linkInfo)
-{
+function createExistingPolyline(linkInfo) {
 	var polyPath = google.maps.geometry.encoding.decodePath(linkInfo.polylineString);
 	//create an arrow path object to add to the polyline
-	var arrowSymbol =
-	{
-		path : google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-		scale : 2,
-		strokeColor : '#444444',
-		strokeWeight : 1,
-		fillOpacity : 1,
-		fillColor : '#444444'
-		
+	var arrowSymbol = {
+		path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+		scale: 2,
+		strokeColor: '#444444',
+		strokeWeight: 1,
+		fillOpacity: 1,
+		fillColor: '#444444'
+
 	};
-	var mypoly = new google.maps.Polyline(
-	{
-		path : polyPath,
-		geodesic : true,
+	var mypoly = new google.maps.Polyline({
+		path: polyPath,
+		geodesic: true,
 		//strokeColor : '#444444',
-		strokeOpacity : 1,
-		strokeWeight : 2,
-		icons : [
-		{
-			icon : arrowSymbol,
-			offset : '50%'
+		strokeOpacity: 1,
+		strokeWeight: 2,
+		icons: [{
+			icon: arrowSymbol,
+			offset: '50%'
 		}],
 	});
 
@@ -912,7 +1098,7 @@ function travelTimeDataSuccess(results) {
 
 						mimLinks[j].linkColor = getColor(mimLinks[j].sid, mimLinks[j].medianTtSeconds, mimLinks[j].medianSpeedMph, mimLinks[j].numberOfRecords);
 						mimLinks[j].setOptions({
-							strokeColor : mimLinks[j].linkColor
+							strokeColor: mimLinks[j].linkColor
 							//strokeColor: getColor(mimLinks[j].sid, mimLinks[j].medianTtSeconds, mimLinks[j].medianSpeedMph, mimLinks[j].numberOfRecords)
 						});
 						mimLinks[j].icons[0].icon.fillColor = mimLinks[j].linkColor;
@@ -926,7 +1112,7 @@ function travelTimeDataSuccess(results) {
 			//console.log("success parsing new travel time data - " + moment().format("MM-DD-YY HH:mm:ss"));
 			mimData = [];
 		}
-	} catch(error) {
+	} catch (error) {
 		showDialog("Error Parsing Travel Time Data", "There was an eror parsing the live travel time data received from the server. Wait for next refresh cycle to correct the problem.");
 	}
 }
@@ -956,214 +1142,214 @@ function getColor(linkSid, travelTime, speed, nRecords) {
 		//decide what type of color system to use using the segmentID property.
 		switch (linkSid.toString()) {
 
-		/*
-		 *
-		 * The segments below are local streets outside of Midtown. if the segment is a local street not MIM then use the MUTCD local street speed system
-		 *
-		 */
-		case '11771':
-		case '11772':
-		case '71101':
-		case '10171':
-		case '72117':
-		case '71117':
-		case '8788':
-		case '8887':
-		case '8889':
-		case '8988':
-		case '8990':
-		case '9089':
-		case '9091':
-		case '9190':
-		case '9192':
-		case '9291':
-		case '6563':
-		case '6364':
-		case '6374':
-		case '7071':
-		case '7170':
-		case '7073':
-		case '7370':
-		case '123124':
-		case '7462':
-		case '6274':
-		case '7466':
-		case '6674':
-		case '6667':
-		case '8466':
-		case '66128':
-		case '124123':
-		case '124125':
-		case '125124':
-		case '62126':
-		case '12662':
-		case '125127':
-		case '127125':
-		case '127121':
-		case '121127':
-		case '121126':
-		case '126121':
-		case '12868':
-		case '7463':
-		case '6768':
-		case '9394':
-		case '9498':
-		case '9493':
-		case '9894':
-		case '10098':
-		case '98100':
-		case '111112':
-		case '112111':
-		case '111113':
-		case '113111':
-		case '11393':
-		case '93113':
-		case '100115':
-		case '115100':
-		case '131129':
-		case '129131':
-		case '129130':
-		case '130129':
-		case '6663':
-		case '6366':
-		case '114115':
-		case '115114':
-		case '8687':
-		case '8786':
-		case '9596':
-		case '9695':
-		case '9697':
-		case '9986':
-		case '8699':
-		case '9796':
-		case '9799':
-		case '9997':
-		case '133134':
-		case '134133':
-		case '134122':
-		case '122134':
-		case '122135':
-		case '135122':
-		case '135120':
-		case '120135':
-		case '130139':
-		case '139130':
-		case '140120':
-		case '120140':
-		case '140144':
-		case '144140':
-		case '14492':
-		case '92144':
-		case '12662':
-		case '62126':
-		case '126145':
-		case '145126':
-		case '146139':
-		case '139146':
-		case '121146':
-		case '146121':
-		case '150147':
-		case '147150':
-		case '150148':
-		case '148150':
-		case '148151':
-		case '151148':
+			/*
+			 *
+			 * The segments below are local streets outside of Midtown. if the segment is a local street not MIM then use the MUTCD local street speed system
+			 *
+			 */
+			case '11771':
+			case '11772':
+			case '71101':
+			case '10171':
+			case '72117':
+			case '71117':
+			case '8788':
+			case '8887':
+			case '8889':
+			case '8988':
+			case '8990':
+			case '9089':
+			case '9091':
+			case '9190':
+			case '9192':
+			case '9291':
+			case '6563':
+			case '6364':
+			case '6374':
+			case '7071':
+			case '7170':
+			case '7073':
+			case '7370':
+			case '123124':
+			case '7462':
+			case '6274':
+			case '7466':
+			case '6674':
+			case '6667':
+			case '8466':
+			case '66128':
+			case '124123':
+			case '124125':
+			case '125124':
+			case '62126':
+			case '12662':
+			case '125127':
+			case '127125':
+			case '127121':
+			case '121127':
+			case '121126':
+			case '126121':
+			case '12868':
+			case '7463':
+			case '6768':
+			case '9394':
+			case '9498':
+			case '9493':
+			case '9894':
+			case '10098':
+			case '98100':
+			case '111112':
+			case '112111':
+			case '111113':
+			case '113111':
+			case '11393':
+			case '93113':
+			case '100115':
+			case '115100':
+			case '131129':
+			case '129131':
+			case '129130':
+			case '130129':
+			case '6663':
+			case '6366':
+			case '114115':
+			case '115114':
+			case '8687':
+			case '8786':
+			case '9596':
+			case '9695':
+			case '9697':
+			case '9986':
+			case '8699':
+			case '9796':
+			case '9799':
+			case '9997':
+			case '133134':
+			case '134133':
+			case '134122':
+			case '122134':
+			case '122135':
+			case '135122':
+			case '135120':
+			case '120135':
+			case '130139':
+			case '139130':
+			case '140120':
+			case '120140':
+			case '140144':
+			case '144140':
+			case '14492':
+			case '92144':
+			case '12662':
+			case '62126':
+			case '126145':
+			case '145126':
+			case '146139':
+			case '139146':
+			case '121146':
+			case '146121':
+			case '150147':
+			case '147150':
+			case '150148':
+			case '148150':
+			case '148151':
+			case '151148':
 
-		//flushing links
-		case '158157':
-		case '157158':
-		case '157159':
-		case '159157':
-		case '160157':
-		case '157160':
-		case '160159':
-		case '183160':
-		case '160183':
-		case '161162':
-		case '164163':
-		case '163164':
-		case '164165':
-		case '165164':
-		case '165158':
-		case '158165':
-		case '177178':
-		case '178177':
-		case '157177':
-		case '177157':
-		case '177176':
-		case '176177':
-		case '176175':
-		case '175176':
-		case '162175':
-		case '179159':
-		case '159179':
-		case '162179':
-		case '179162':
-		case '183161':
-		case '161183':
-		// end of flushing links
+				//flushing links
+			case '158157':
+			case '157158':
+			case '157159':
+			case '159157':
+			case '160157':
+			case '157160':
+			case '160159':
+			case '183160':
+			case '160183':
+			case '161162':
+			case '164163':
+			case '163164':
+			case '164165':
+			case '165164':
+			case '165158':
+			case '158165':
+			case '177178':
+			case '178177':
+			case '157177':
+			case '177157':
+			case '177176':
+			case '176177':
+			case '176175':
+			case '175176':
+			case '162175':
+			case '179159':
+			case '159179':
+			case '162179':
+			case '179162':
+			case '183161':
+			case '161183':
+				// end of flushing links
 
-		//links for woodhaven to/from dry harbor
-		case '17095':
-		case '95170':
+				//links for woodhaven to/from dry harbor
+			case '17095':
+			case '95170':
 
-		//links on beach channel dr and seagirt
-		case '182154':
-		case '154182':
-		case '154181':
-		case '181154':
-		case '181156':
-		case '156181':
-		case '180155':
-		case '155180':
-			linkColor = applyLocalStreetColorSystem(speed, nRecords);
-			break;
+				//links on beach channel dr and seagirt
+			case '182154':
+			case '154182':
+			case '154181':
+			case '181154':
+			case '181156':
+			case '156181':
+			case '180155':
+			case '155180':
+				linkColor = applyLocalStreetColorSystem(speed, nRecords);
+				break;
 
-		/*
-		 *
-		 * the links below are highway type links. use the highway color system to assign a color
-		 *
-		 */
-		case '2426':
-		case '2829':
-		case '3527':
-		case '2535':
-		case '3425':
-		case '2734':
-		case '3428':
-		case '2634':
-		case '3324':
-		case '3536':
-		case '29150':
+				/*
+				 *
+				 * the links below are highway type links. use the highway color system to assign a color
+				 *
+				 */
+			case '2426':
+			case '2829':
+			case '3527':
+			case '2535':
+			case '3425':
+			case '2734':
+			case '3428':
+			case '2634':
+			case '3324':
+			case '3536':
+			case '29150':
 
-		//jackie robinson links
-		case '168167':
-		case '167168':
-		case '166167':
-		case '167166':
-		case '169166':
-		case '166169':
+				//jackie robinson links
+			case '168167':
+			case '167168':
+			case '166167':
+			case '167166':
+			case '169166':
+			case '166169':
 
-		//henry hudson pkwy / west side hwy links
-		case '17131':
-		case '30171':
-		case '171172':
-		case '172171':
-		case '173172':
-		case '172173':
-		case '173174':
-		case '174173':
-			linkColor = applyHighwaysColorSystem(speed, nRecords);
-			break;
+				//henry hudson pkwy / west side hwy links
+			case '17131':
+			case '30171':
+			case '171172':
+			case '172171':
+			case '173172':
+			case '172173':
+			case '173174':
+			case '174173':
+				linkColor = applyHighwaysColorSystem(speed, nRecords);
+				break;
 
-		/*
-		 *
-		 * as default, if the segment is not a local street or a highway, then use the MIM color scheme to assign the color to the link
-		 *
-		 */
-		default:
-			linkColor = applyMidtownInMotionColorSystem(speed, travelTime, nRecords);
-			break;
+				/*
+				 *
+				 * as default, if the segment is not a local street or a highway, then use the MIM color scheme to assign the color to the link
+				 *
+				 */
+			default:
+				linkColor = applyMidtownInMotionColorSystem(speed, travelTime, nRecords);
+				break;
 
 		}
 	}
@@ -1331,18 +1517,18 @@ function makeCameraMarker(cam) {
 	var camStatus = 1;
 	var camIcon;
 	//get the logos
-	switch(cam._owner) {
-	case "MTA":
-		var logo = logo_mta;
-		break;
-	case "nycdot":
-		var logo = logo_nyc;
-		break;
-	case "nysdot":
-		var logo = logo_nys;
-		break;
-	default:
-		var logo = null;
+	switch (cam._owner) {
+		case "MTA":
+			var logo = logo_mta;
+			break;
+		case "nycdot":
+			var logo = logo_nyc;
+			break;
+		case "nysdot":
+			var logo = logo_nys;
+			break;
+		default:
+			var logo = null;
 	}
 
 	google.maps.event.addDomListener(cameraInfoWindow, 'domready', modifyInfoWindowCss);
@@ -1354,26 +1540,26 @@ function makeCameraMarker(cam) {
 	//for production you need to use this var to set the correct icon
 	if (camStatus == 1) {
 		var img = {
-			url : cctv_good,
-			size : new google.maps.Size(20, 20),
-			origin : new google.maps.Point(0, 0),
-			anchor : new google.maps.Point(0, 0)
+			url: cctv_good,
+			size: new google.maps.Size(20, 20),
+			origin: new google.maps.Point(0, 0),
+			anchor: new google.maps.Point(0, 0)
 		};
 	} else {
 		var img = {
-			url : cctv_fail,
-			size : new google.maps.Size(20, 20),
-			origin : new google.maps.Point(0, 0),
-			anchor : new google.maps.Point(0, 0)
+			url: cctv_fail,
+			size: new google.maps.Size(20, 20),
+			origin: new google.maps.Point(0, 0),
+			anchor: new google.maps.Point(0, 0)
 		};
 	}
 
 	camIcon = img;
 	//create the marker and set the options object
 	var camMarker = new google.maps.Marker({
-		position : camPosition,
-		icon : camIcon,
-		title : camName
+		position: camPosition,
+		icon: camIcon,
+		title: camName
 	});
 
 	google.maps.event.addListener(camMarker, 'click', function() {
@@ -1490,4 +1676,3 @@ function closeChartIw() {
 	chart.clear();
 	clearInterval(refreshLiveDataTimer);
 }
-
