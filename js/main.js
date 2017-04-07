@@ -20,61 +20,14 @@ var readerLocationIcon = "img/icons/bullet_green.png";
 var readerLocationIcon_good = "img/icons/bullet_green.png";
 var readerLocationIcon_fail = "img/icons/bullet_black.png";
 
-
 var readerLocations;
 
 //the vars below are used for the marker cluster and marker cluster styles
 //markerCluster is the MarkerCluster object to clluster the cameras together. it is defined by the MarkerCluster Library.
 //myCameraMarkers is an array that is used by the MarkerCluster class to cluster the cameras together. it is also used to hide the cameras overlay using the menu
-//cctvClusterStyle are the styles array for the markercluster using my own icons for the cctv obejcts
+//cctvClusterStyle are the styles array for the markercluster using my own icons for the cctv obj and is stored in the markerClusterStyle.js file
 var markerCluster;
 var myCameraMarkers = new Array();
-var cctvClusterStyle = [{
-	url: "img/cctv/cluster/cctv_blue.png",
-	height: 40,
-	width: 40,
-	anchor: [20, 0],
-	textColor: "#000000",
-	textSize: 14,
-	fontFamily: "ubuntu",
-	fontWeight: "normal"
-}, {
-	url: "img/cctv/cluster/cctv_yellow.png",
-	height: 50,
-	width: 50,
-	anchor: [25, 0],
-	textColor: "#000000",
-	textSize: 14,
-	fontFamily: "ubuntu",
-	fontWeight: "normal",
-}, {
-	url: "img/cctv/cluster/cctv_red.png",
-	height: 60,
-	width: 60,
-	anchor: [30, 0],
-	textColor: "#444444",
-	textSize: 14,
-	fontFamily: "ubuntus",
-	fontWeight: "normal"
-}, {
-	url: "img/cctv/cluster/cctv_pink.png",
-	height: 70,
-	width: 70,
-	anchor: [35, 0],
-	textColor: "#444444",
-	textSize: 14,
-	fontFamily: "ubuntu",
-	fontWeight: "normal"
-}, {
-	url: "img/cctv/cluster/cctv_purple.png",
-	height: 80,
-	width: 80,
-	anchor: [40, 0],
-	textColor: "#444444",
-	textSize: 22,
-	fontFamily: "ubuntu",
-	fontWeight: "normal"
-}];
 
 //we define an infowindow object to hold the camera image.
 var cameraInfoWindow = new google.maps.InfoWindow();
@@ -141,16 +94,15 @@ function initialize() {
 	//create an arrow symbol for the polylines
 	arrowSymbol = {
 		path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-		scale: 2,
-		strokeColor: '#444444',
+		scale:2,
+		strokeColor:'#444444',
 		strokeWeight: 1,
 		fillOpacity: 1,
 		fillColor: '#444444'
-
 	};
 
-	//create a custom map style
-	var customMapStyle = createMyMapStyle();
+	//create a custom map style using the style defined in the gmap_style.js file
+	var customMapStyle = style;
 	var styledMap = new google.maps.StyledMapType(customMapStyle, {
 		name: "tmc"
 	});
@@ -180,7 +132,7 @@ function initialize() {
 	map.setMapTypeId("map_style");
 	google.maps.event.addListenerOnce(map, "tilesloaded", ontilesloaded);
 
-	//set the application time and data once
+	//set the application time and date
 	myTime = moment().format("hh:mm:ss a");
 	myDate = moment().format("dddd, MMMM DD");
 
@@ -210,7 +162,7 @@ function initialize() {
 	var myMessageControl = new mapDesclaimer(dOptions);
 	var myLegendControl = new mapLegend(legendOptions);
 
-	//set the timer
+	//set the timer and Start
 	appTimer.Tick = mytick;
 	appTimer.Enable = true;
 	appTimer.Start();
@@ -223,15 +175,23 @@ function initialize() {
  */
 function ontilesloaded() {
 	//console.log('tiles loaded...so begin the loading of the weborb objects');
+
 	//invoke weborb server
 	//invokeServer(true);
+
+
+	// mim data requests
+	// TODO: enable these two function when we stopusing the weborb web server. for now they are being handled by weborb
 	//getMimLocations();
+	//getMimPolylines();
+
+	// transcom data requests
 	getTranscomLocations();
 	getTranscomPolylines();
 
+	// wifi data requests
 	getWifiLocations();
 	getWifiPolylines();
-	//getMimPolylines();
 }
 
 /**
@@ -244,7 +204,6 @@ function ontilesloaded() {
  * of weborb in order for the application to work.
  */
 function invokeServer(syncMode) {
-
 	var className = "flowMapSolutions_dev.EzPassData";
 	var webORBURL = "http://flowmap.nyctmc.org/weborb4/weborb.aspx";
 
@@ -253,7 +212,6 @@ function invokeServer(syncMode) {
 	proxy.getMidtownEzPassLocations(new Async(successReaderLocation, errorDownloadingData));
 	proxy.getMidtownEzpassLinks(new Async(successMimPolylines, errorDownloadingData));
 	proxy.getWebCameras(new Async(successGotCamera, errorDownloadingData));
-
 }
 
 function getWifiLocations() {
@@ -478,12 +436,6 @@ function getWifiPolylines_success(results) {
 	//console.log("sucess getting transcom polylines: "+results.RECORDS.length);
 	if (results.RECORDS != null && results.RECORDS.length != 0) {
 		for (var i = 0; i < results.RECORDS.length; i++) {
-			//console.log(results.RECORDS[i].xcomID);
-			//
-			//
-			// Define a symbol using SVG path notation, with an opacity of 1.
-
-
 			var mypoly = new google.maps.Polyline({
 				path: google.maps.geometry.encoding.decodePath(results.RECORDS[i].polyline),
 				geodesic: true,
@@ -510,7 +462,6 @@ function getWifiPolylines_success(results) {
 		}
 		//after the polylines are drawn get the data for the first time
 		getWifiLinkData();
-
 	} else {
 		alert("no polylines found on server");
 	}
@@ -530,9 +481,7 @@ function processWifiLinkData_success(results) {
 				wifiLinks[j].numberOfRecords = results.RECORDS[i].n_records;
 				wifiLinks[j].recordTimeStamp = results.RECORDS[i].time_stamp;
 
-
 				wifiLinks[j].linkColor = getWifiLinkColor(1, wifiLinks[j].medianTt_sec, wifiLinks[j].numberOfRecords);
-
 
 				wifiLinks[j].setOptions({
 					strokeColor: wifiLinks[j].linkColor,
@@ -540,8 +489,9 @@ function processWifiLinkData_success(results) {
 						icon: {
 							path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
 							scale: 2,
-							strokeColor: '#444',
-							strokeWeight: .5,
+							strokeColor: '#444444',
+							strokeWeight: 1,
+							fillColor:wifiLinks[j].linkColor,
 							fillOpacity: 1,
 						},
 						offset: '50%'
@@ -555,16 +505,16 @@ function processWifiLinkData_success(results) {
 function getWifiLinkColor(speed, travelTime, nRecords) {
 	var c = 'undefined';
 	if (speed > 0) {
-		if (nRecords < 2) {
+		if ((nRecords < 2) && (nRecords > 0)) {
 			c = '#4E7AC7';
 			//blue
-		} else if (0 < travelTime && travelTime <= 180) {
+		} else if ((0 < travelTime) && (travelTime <= 180)) {
 			c = '#32CD32';
 			//green
-		} else if (180 < travelTime && travelTime <= 270) {
+		} else if ((180 < travelTime) && (travelTime <= 270)) {
 			c = '#FFDF00';
 			//yellow
-		} else if (270 < travelTime && travelTime <= 360) {
+		} else if ((270 < travelTime) && (travelTime <= 360)) {
 			c = '#ffa500';
 			//orange
 		} else if (360 < travelTime) {
@@ -610,8 +560,6 @@ function onWifiPolylineMouseOut(e) {
 	}
 	linkToolTip.close();
 }
-
-
 
 
 function getTranscomPolylines_success(results) {
@@ -727,7 +675,6 @@ function processTranscomLinkData_error(e) {
 }
 
 /**
- *
  * onPolyMouseOver is the listener method for the google maps mouseover event. it will create a tooltip and change the polyline
  * settings
  */
@@ -750,15 +697,11 @@ function onTranscomPolylineMouseOver(e) {
 	tooltipContent += "<br>confidence level: " + this.ConfidenceLevel;
 	tooltipContent += "<br>Synthetic Link: " + this.FromSyntheticSegment;
 
-
 	linkToolTip.setContent(tooltipContent);
 	//here e is the overlay object and whenever we hover over the overlay we can get the coords to use with our infobox tooltip
 	linkToolTip.setPosition(e.latLng);
 	linkToolTip.open(map);
 }
-
-
-
 
 function onMimPolylineMouseOver(e) {
 	var tooltipContent = "";
@@ -781,7 +724,6 @@ function onMimPolylineMouseOver(e) {
 
 
 /**
- *
  * onPolyMouseOver is the listener method for the google maps mouseover event. it will create a tooltip and change the polyline
  * settings
  */
@@ -791,7 +733,6 @@ function onPolylineMouseOver(e) {
 	if (this.linkColor != "undefined") {
 		this.icons[0].icon.fillColor = this.linkColor;
 	}
-
 	tooltipContent = "<span>" + this.linkName + "</span><hr>number of records: " + this.numberOfRecords;
 	tooltipContent += "<br>approx. median travel-time: " + this.medianTtString;
 	tooltipContent += "<br>approx. median speed (mph): " + this.medianSpeedMph;
@@ -799,7 +740,6 @@ function onPolylineMouseOver(e) {
 	tooltipContent += "<br>segment length: " + this.linkLength + " meters (" + (this.linkLength * 3.2808).toFixed(2) + " ft)";
 	tooltipContent += "<br>segment ID " + this.sid;
 	tooltipContent += "<br>segment points: " + this.lid0 + " to " + this.lid1;
-
 	linkToolTip.setContent(tooltipContent);
 	//here e is the overlay object and whenever we hover over the overlay we can get the coords to use with our infobox tooltip
 	linkToolTip.setPosition(e.latLng);
@@ -841,7 +781,6 @@ function mytick() {
 	//console.log(myDate+" "+myTime+" timer current count: "+appTimer.currentCount);
 	if (appTimer.currentCount == dataRefreshInterval_seconds) {
 
-
 		//refresh the MIM data
 		//console.log('refreshing data');
 		//proxy.getSegmentsMedianTravelTimes("00:15:00", new Async(travelTimeDataSuccess, travelTimeDataError));
@@ -856,93 +795,6 @@ function mytick() {
 	}
 
 };
-/**
- * createMyMapStyle returns the custom google maps stylers
- */
-function createMyMapStyle() {
-
-	var style = new Array();
-
-	var style = [{
-		"featureType": "administrative",
-		"elementType": "all",
-		"stylers": [{
-			"visibility": "on"
-		}, {
-			"saturation": -100
-		}, {
-			"lightness": 20
-		}]
-	}, {
-		"featureType": "administrative.neighborhood",
-		"elementType": "labels.text",
-		"stylers": [{
-			"visibility": "off"
-		}]
-	}, {
-		"featureType": "landscape.man_made",
-		"elementType": "all",
-		"stylers": [{
-			"visibility": "off"
-		}, {
-			"saturation": -60
-		}, {
-			"lightness": 10
-		}]
-	}, {
-		"featureType": "landscape.natural",
-		"elementType": "all",
-		"stylers": [{
-			"visibility": "simplified"
-		}, {
-			"saturation": -60
-		}, {
-			"lightness": 60
-		}]
-	}, {
-		"featureType": "poi",
-		"elementType": "all",
-		"stylers": [{
-			"visibility": "off"
-		}, {
-			"saturation": -100
-		}, {
-			"lightness": 60
-		}]
-	}, {
-		"featureType": "road",
-		"elementType": "all",
-		"stylers": [{
-			"visibility": "on"
-		}, {
-			"saturation": -100
-		}, {
-			"lightness": 40
-		}]
-	}, {
-		"featureType": "transit",
-		"elementType": "all",
-		"stylers": [{
-			"visibility": "off"
-		}, {
-			"saturation": -100
-		}, {
-			"lightness": 60
-		}]
-	}, {
-		"featureType": "water",
-		"elementType": "all",
-		"stylers": [{
-			"visibility": "on"
-		}, {
-			"saturation": -10
-		}, {
-			"lightness": 30
-		}]
-	}];
-
-	return style;
-}
 
 function successReaderLocation(results) {
 	if (results.length != 0 || results != null) {
@@ -950,11 +802,8 @@ function successReaderLocation(results) {
 			var readerLocation = createReaderMarker(results[i]);
 			readerLocations.push(readerLocation);
 		}
-		//document.getElementById("readerLocationsNumber").innerHTML += " " + results.length;
-
 	}
 }
-
 
 function createReaderMarker(readerLocationObj) {
 	var locationCoords = new google.maps.LatLng(readerLocationObj.lat, readerLocationObj.lng);
@@ -974,9 +823,7 @@ function createReaderMarker(readerLocationObj) {
 	return readerMarker;
 }
 
-//---------------------------------------------------------------------------------------polyline link functions-------------------------------------------------------//
 /**
- *
  * successMimPolylines
  */
 function successMimPolylines(results) {
@@ -987,9 +834,7 @@ function successMimPolylines(results) {
 			mimLinks.push(polyline);
 		}
 
-		//document.getElementById("linkNumber").innerHTML += " " + results.length;
 		results = [];
-
 		//after the polylines are drawn get the data for the first time
 		proxy.getSegmentsMedianTravelTimes("00:15:00", new Async(travelTimeDataSuccess, travelTimeDataError));
 	} else {
@@ -1009,6 +854,7 @@ function createExistingPolyline(linkInfo) {
 		fillColor: '#444444'
 
 	};
+
 	var mypoly = new google.maps.Polyline({
 		path: polyPath,
 		geodesic: true,
@@ -1041,13 +887,8 @@ function createExistingPolyline(linkInfo) {
 	return mypoly;
 }
 
-
-//---------------------------------------------------------------------------------------polyline link functions-------------------------------------------------------//
-
 /**
- *
  * errorDownloadingData is a generic listener method on the Async object calling the server for data.
- *
  */
 function errorDownloadingData(error) {
 	showDialog("Error downloading Data from Server", "There was an error downloading data from the server. Check the stack below.<br>" + error.message);
@@ -1056,7 +897,6 @@ function errorDownloadingData(error) {
 /**
  * onPolylineMouseClick is a google maps event listener method that will run when a polyline is clicked
  * it will execute the showChart method which will open up the chart object div
- *
  */
 function onPolylineMouseClick(e) {
 	//this is the actual polyline object
@@ -1463,10 +1303,7 @@ function applyMidtownInMotionColorSystem(speed, travelTime, nRecords) {
 }
 
 //----------------------------------------- end of polyline link functions-------------------------------------------------------//
-/**
- *
- *
- */
+
 function successGotCamera(response) {
 	//this array will be used for the markercluster
 
@@ -1669,9 +1506,7 @@ function closeChartIw() {
 	//we set the opacity back to zero to reset the transition effect
 	el.style.filter = 'alpha(opacity=0)';
 	el.style.visibility = "hidden";
-	//we clear the overlay from the screeen
-
-	//chartData and chart are object for the amchart in the mycustomcontrols lib
+	//we clear the overlay from the screeen chartData and chart are object for the amchart in the mycustomcontrols lib
 	chartData = [];
 	chart.clear();
 	clearInterval(refreshLiveDataTimer);

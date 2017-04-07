@@ -1,4 +1,4 @@
-var Timer = function() 
+var Timer = function()
 {
 	// Property: Frequency of elapse event of the timer in millisecond
 	this.Interval = 1000;
@@ -8,7 +8,7 @@ var Timer = function()
 
 	// Property: keep a current count of the timer iterations
 	this.currentCount = 0;
-	
+
 	// Event: Timer tick
 	this.Tick;
 
@@ -37,19 +37,13 @@ var Timer = function()
 		clearInterval(thisObject.timerId);
 		thisObject.currentCount = 0;
 	};
-	
+
 	// Function: reset the timer
-	
 	this.Reset = function()
 	{
 		thisObject = this;
 		thisObject.Enable = new Boolean(false);
 		this.Stop();
 		this.Start();
-		
-		
 	};
-	
-
-
-}; 
+};
