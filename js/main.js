@@ -177,11 +177,11 @@ function ontilesloaded() {
 	//console.log('tiles loaded...so begin the loading of the weborb objects');
 
 	//invoke weborb server
-	//invokeServer(true);
+	invokeServer(true);
 
 
 	// mim data requests
-	// TODO: enable these two function when we stopusing the weborb web server. for now they are being handled by weborb
+	// TODO: enable these two function when we stop using the weborb web server. for now they are being handled by weborb
 	//getMimLocations();
 	//getMimPolylines();
 
@@ -206,12 +206,21 @@ function ontilesloaded() {
 function invokeServer(syncMode) {
 	var className = "flowMapSolutions_dev.EzPassData";
 	var webORBURL = "http://flowmap.nyctmc.org/weborb4/weborb.aspx";
-
 	proxy = webORB.bind(className, webORBURL);
-
 	proxy.getMidtownEzPassLocations(new Async(successReaderLocation, errorDownloadingData));
-	proxy.getMidtownEzpassLinks(new Async(successMimPolylines, errorDownloadingData));
+	//proxy.getMidtownEzpassLinks(new Async(successMimPolylines, errorDownloadingData));
 	proxy.getWebCameras(new Async(successGotCamera, errorDownloadingData));
+}
+
+function invokeServer2(syncMode)
+{
+
+	var className2 = "mim_data.LinkData";
+	var webORBURL2 = "http://flowmap.nyctmc.org/weborb4/weborb.aspx";
+
+	var proxy2 = webORB.bind(className2, webORBURL2);
+	proxy2.getMidtownEzpassLinks(new Async(successMimPolylines, errorDownloadingMimPolylines));
+
 }
 
 function getWifiLocations() {
@@ -229,7 +238,7 @@ function getWifiLocations() {
 function getMimLocations() {
 	$.ajax({
 		type: "GET",
-		url: "data/mim_locations_info.json",
+		url: "http://flowmap.nyctmc.org/flowmap_json_data_sources/mim_locations_info.json",
 		async: true,
 		dataType: "json",
 		contentType: "application/json", // content type sent to server
@@ -279,7 +288,7 @@ function getWifiPolylines() {
 function getMimPolylines() {
 	$.ajax({
 		type: "GET",
-		url: "data/mim_polylines_info.json",
+		url: "http://flowmap.nyctmc.org/flowmap_json_data_sources/mim_polylines_info.json",
 		async: true,
 		dataType: "json",
 		//data: '{"value": "' + 65+ '"}',
